@@ -1,3 +1,5 @@
+package task01;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,14 +32,14 @@ public class httpParser {
             return;
         }
 
-        if (!headers.keySet().contains("Authorization")){
+        if (!headers.keySet().contains("Authorization")) {
             System.out.println("HTTP/1.1 401 Unauthorized");
             responseBody(headers);
             System.out.println("You are not authorized to access the requested functionality.");
             return;
         }
 
-        if (method.equals("POST") && bodyParameters.size() == 0){
+        if (method.equals("POST") && bodyParameters.size() == 0) {
             System.out.println("HTTP/1.1 400 Bad response");
             responseBody(headers);
             System.out.println("There was an error with the requested functionality due to malformed request.");
@@ -47,7 +49,7 @@ public class httpParser {
         OkResponse(bodyParameters, headers);
     }
 
-    private static void OkResponse(Map<String, String> bodyParameters, Map<String, String> headers){
+    private static void OkResponse(Map<String, String> bodyParameters, Map<String, String> headers) {
 
         byte[] decodedBytes = Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1]);
         String userName = new String(decodedBytes);
@@ -56,23 +58,21 @@ public class httpParser {
         String thirdRequestBodyParameter = "";
         int counter = 0;
 
+
         for (Map.Entry<String, String> body : bodyParameters.entrySet()) {
 
-            if (counter == 0) {
-                firstRequestBodyParameter = body.getValue();
-                counter++;
-                continue;
+            switch (counter) {
+                case 0:
+                    firstRequestBodyParameter = body.getValue();
+                    break;
+                case 1:
+                    secondRequestBodyParameter = body.getKey() + " - " + body.getValue();
+                    break;
+                case 2:
+                    thirdRequestBodyParameter = body.getKey() + " - " + body.getValue();
+                    break;
             }
-
-            if (counter == 1){
-                secondRequestBodyParameter = body.getKey() + " - " + body.getValue();
-                counter++;
-                continue;
-            }
-
-            if (counter == 2){
-                thirdRequestBodyParameter = body.getKey() + " - " + body.getValue();
-            }
+            counter++;
         }
 
         System.out.println("HTTP/1.1 200 OK");
@@ -83,11 +83,11 @@ public class httpParser {
                 thirdRequestBodyParameter));
     }
 
-    private static void responseBody( Map<String, String> headers){
-            if (headers.keySet().contains("Date")) System.out.println("Date: " + headers.get("Date"));
-            if (headers.keySet().contains("Host")) System.out.println("Host: " + headers.get("Host"));
-            if (headers.keySet().contains("Content-Type"))
-                System.out.println("Content-Type: " + headers.get("Content-Type"));
+    private static void responseBody(Map<String, String> headers) {
+        if (headers.keySet().contains("Date")) System.out.println("Date: " + headers.get("Date"));
+        if (headers.keySet().contains("Host")) System.out.println("Host: " + headers.get("Host"));
+        if (headers.keySet().contains("Content-Type"))
+            System.out.println("Content-Type: " + headers.get("Content-Type"));
         System.out.println();
 
     }

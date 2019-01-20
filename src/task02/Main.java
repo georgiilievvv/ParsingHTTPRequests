@@ -1,10 +1,9 @@
 package task02;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
 
@@ -14,10 +13,11 @@ public class Main {
 
         HttpRequest httpRequest = new HttpRequestImpl(request);
 
-        System.out.println(httpRequest.toString());
+        HttpResponse httpResponse = new HttpResponseImpl(httpRequest);
+        byte[] array = httpResponse.getBytes();
+        System.out.println(new String(array, StandardCharsets.UTF_8));
     }
 
-    @NotNull
     private static String getRequest() throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -26,7 +26,7 @@ public class Main {
 
         String line;
         while ((line = reader.readLine()) != null && line.length() > 0) {
-            request.append(line).append("\r\n");
+            request.append(line).append(System.lineSeparator());
         }
 
         if ((line = reader.readLine()) != null && line.length() > 0) {

@@ -13,12 +13,12 @@ public class HttpRequestImpl implements HttpRequest {
     HttpRequestImpl(String request) {
 
         this.headers = new HashMap<>();
-        this.bodyParameters = new HashMap<>();
+        this.bodyParameters = new LinkedHashMap<>();
         parseRequest(request);
     }
 
     private void parseRequest(String request) {
-        List<String> lines = Arrays.stream(request.split("\r\n")).collect(Collectors.toList());
+        List<String> lines = Arrays.stream(request.split(System.lineSeparator())).collect(Collectors.toList());
 
         this.setRequestUrl(lines.get(0).split(" ")[1]);
         this.setMethod(lines.get(0).split(" ")[0]);
@@ -30,7 +30,7 @@ public class HttpRequestImpl implements HttpRequest {
             this.addHeader(headerAndValue[0], headerAndValue[1]);
         }
 
-        if (!lines.get(lines.size() - 1).isEmpty()) {
+        if (lines.get(lines.size() - 2).isEmpty()) {
             String[] body = lines.get(lines.size() - 1).split("&");
 
             for (String s : body) {
@@ -42,7 +42,7 @@ public class HttpRequestImpl implements HttpRequest {
 
         }else {
 
-            String[] headerAndValue = lines.get(lines.size() - 2).split(": ");
+            String[] headerAndValue = lines.get(lines.size() - 1).split(": ");
 
             this.addHeader(headerAndValue[0], headerAndValue[1]);
         }
@@ -92,15 +92,5 @@ public class HttpRequestImpl implements HttpRequest {
     @Override
     public boolean isResource() {
         return !this.getBodyParameters().isEmpty();
-    }
-
-    @Override
-    public String toString() {
-        return "HttpRequestImpl{" +
-                "requestUrl='" + requestUrl + '\'' +
-                ", method='" + method + '\'' +
-                ", headers=" + headers +
-                ", bodyParameters=" + bodyParameters +
-                '}';
     }
 }
